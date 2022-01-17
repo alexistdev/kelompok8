@@ -1,0 +1,249 @@
+@if($template == 'sbadmin')
+    @notifyCss
+    <x-sbadmin.dashboard-layout :title="$judul" :tagSubMenu="$tagSubMenu" :total-notif="null">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Produk</h1>
+
+        </div>
+
+        <!-- Content Row -->
+        <div class="row">
+
+            <!-- Earnings (Monthly) Card Example -->
+            <div class="col-12">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-header">
+                        <x:notify-messages/>
+                        <h3 class="card-title">Daftar Toko</h3>
+                        <a href="{{route('toko.addproduk')}}">
+                            <button class="btn btn-primary btn-sm float-right">TAMBAH</button>
+                        </a>
+                    </div>
+                    <div class="card-body">
+
+                        <table class="table table-bordered table-striped mb-0 display nowrap" id="tabeltoko"
+                               style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th scope="col" class="text-center">#</th>
+                                <th scope="col" class="text-center">KATEGORI</th>
+                                <th scope="col" class="text-center">NAMA</th>
+                                <th scope="col" class="text-center">SATUAN</th>
+                                <th scope="col" class="text-center">HARGA</th>
+                                <th scope="col" class="text-center">GAMBAR</th>
+                                <th scope="col" class="text-center">DIBUAT</th>
+                                <th scope="col" class="text-center">ACTION</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                        <!-- START: MODAL HAPUS -->
+                        <div class="modal fade" id="modalHapus" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <form action="{{route('toko.deleteproduk')}}" method="post">
+                                    @csrf
+                                    @method('delete')
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">HAPUS</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input type="text" id="idhapus" name="id" value="">
+                                            Apakah anda ingin menghapus data ini?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-danger">Hapus</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- END: MODAL HAPUS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- START: Script -->
+        <x-sbadmin.footer-layout />
+        <!-- END: Script -->
+        <script>
+            $('#tabeltoko').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('toko.produk') }}",
+                columns: [
+                    {
+                        data: 'index',
+                        class: 'text-center',
+                        defaultContent: '',
+                        orderable: false,
+                        searchable: false,
+                        width: '5%',
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1; //auto increment
+                        }
+                    },
+                    {data: 'kategori.name', class: 'text-left'},
+                    {data: 'name', class: 'text-left'},
+                    {data: 'satuan', class: 'text-left'},
+                    // {data: 'gambar', class: 'text-left'},
+                    {data: 'harga', class: 'text-left'},
+                    {
+                        data: 'gambar', class: 'text-left', render: function (data, type, row, meta) {
+                            return "<img src=\"{{ url('storage/produk/') }}" + '/' + data + "\" height=\"50\"/>";
+                        }
+                    },
+                    {data: 'created_at', class: 'text-left'},
+                    {data: 'action', width: '15%', class: 'text-center'},
+                ],
+
+            });
+            $(document).on("click", ".hapus", function () {
+                var id = $(this).data('id');
+                $('#idhapus').val(id);
+
+            });
+        </script>
+    </x-sbadmin.dashboard-layout>
+@else
+    <x-backend.dashboard-layout :title="$judul" :tagSubMenu="$tagSubMenu" :total-notif="null">
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1>PRODUK</h1>
+                        </div>
+                        <div class="col-sm-6">
+                            <ol class="breadcrumb float-sm-right">
+                                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                <li class="breadcrumb-item active">Produk</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div><!-- /.container-fluid -->
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <x:notify-messages/>
+                <!-- Default box -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Daftar Toko</h3>
+                        <a href="{{route('toko.addproduk')}}">
+                            <button class="btn btn-primary btn-sm float-right">TAMBAH</button>
+                        </a>
+                        @if ($message = Session::get('success'))
+                            <div class="alert alert-success alert-block">
+                                <button type="button" class="close" data-dismiss="alert">×</button>
+                                <strong>{{ $message }}</strong>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-striped mb-0 display nowrap" id="tabeltoko"
+                               style="width: 100%">
+                            <thead>
+                            <tr>
+                                <th scope="col" class="text-center">#</th>
+                                <th scope="col" class="text-center">KATEGORI</th>
+                                <th scope="col" class="text-center">NAMA</th>
+                                <th scope="col" class="text-center">SATUAN</th>
+                                <th scope="col" class="text-center">HARGA</th>
+                                <th scope="col" class="text-center">GAMBAR</th>
+                                <th scope="col" class="text-center">DIBUAT</th>
+                                <th scope="col" class="text-center">ACTION</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.card-body -->
+                    <div class="card-footer">
+                        Footer
+                    </div>
+                    <!-- /.card-footer-->
+                </div>
+                <!-- /.card -->
+                <!-- START: MODAL HAPUS -->
+                <div class="modal fade" id="modalHapus" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <form action="{{route('toko.deleteproduk')}}" method="post">
+                            @csrf
+                            @method('delete')
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">HAPUS</h5>
+                                </div>
+                                <div class="modal-body">
+                                    <input type="text" id="idhapus" name="id" value="">
+                                    Apakah anda ingin menghapus data ini?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-danger">Hapus</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- END: MODAL HAPUS -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- START: Script -->
+        <x-backend.script-layout/>
+        <!-- END: Script -->
+        <script>
+            $('#tabeltoko').DataTable({
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: "{{ route('toko.produk') }}",
+                columns: [
+                    {
+                        data: 'index',
+                        class: 'text-center',
+                        defaultContent: '',
+                        orderable: false,
+                        searchable: false,
+                        width: '5%',
+                        render: function (data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1; //auto increment
+                        }
+                    },
+                    {data: 'kategori.name', class: 'text-left'},
+                    {data: 'name', class: 'text-left'},
+                    {data: 'satuan', class: 'text-left'},
+                    // {data: 'gambar', class: 'text-left'},
+                    {data: 'harga', class: 'text-left'},
+                    {
+                        data: 'gambar', class: 'text-left', render: function (data, type, row, meta) {
+                            return "<img src=\"{{ url('storage/produk/') }}" + '/' + data + "\" height=\"50\"/>";
+                        }
+                    },
+                    {data: 'created_at', class: 'text-left'},
+                    {data: 'action', width: '15%', class: 'text-center'},
+                ],
+
+            });
+            $(document).on("click", ".hapus", function () {
+                var id = $(this).data('id');
+                $('#idhapus').val(id);
+
+            });
+        </script>
+        @notifyJs
+    </x-backend.dashboard-layout>
+@endif
